@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- Bootstrap CSS -->
+<link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.min.css}"
+  integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous">
+<link rel="stylesheet" th:href="@{/css/docs.min.css}">
+<link rel="stylesheet" th:href="@{/css/glyphicons.css}">
+<link rel="stylesheet" th:href="@{/fontawesome/css/all.min.css}">
+<link rel="stylesheet" th:href="@{/bootstrap3-editable/css/bootstrap-editable.css}">
+  
+  <title>人员管理</title>
+  <style>
+
+  </style>
+</head>
+<body>
+<input type="hidden" id="username" name="username" th:value="${userinfo.name}">
+<input type="hidden" id="roles" name="roles" th:value="${userinfo.roles}">
+  <header
+    class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar">
+    <a class="navbar-brand" href="/">短应用&trade;</a>
+
+    <div class="navbar-nav-scroll">
+      <ul class="navbar-nav bd-navbar-nav flex-row">
+        <li class="nav-item">
+          <a class="nav-link active" href="/abd/my">我的短应用</a>
+        </li>
+      </ul>
+    </div>
+
+    <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+
+    </ul>
+    <span class="navbar-text" th:text="${userinfo.name}">
+      Navbar text with an inline element
+    </span>
+  </header>
+<p></p>
+
+<div class="container-fluid">
+  <div class="row">
+  <div class="col-3">
+    <div class="list-group" id="list-tab" role="tablist">
+    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active" id="list-group-list" data-toggle="list" href="#list-group" role="tab" aria-controls="group" th:utext="${'<span><i class=''fas fa-home''></i> ' + currentgroup.name + '</span>'}"></a>
+    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" th:id="${'list-' + groupsa.saPrefix + '-list'}" th:data-sa="${groupsa.saPrefix}" data-toggle="list" th:href="${'#list-' + groupsa.saPrefix}" role="tab" th:aria-controls="${groupsa.saPrefix}" th:utext="${' <span><i class=''fab fa-nutritionix''></i> ' + groupsa.saName + '</span>'}" th:each="groupsa : ${currentgroupsas}"></a>
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="list-group" role="tabpanel" aria-labelledby="list-group-list">...</div>
+    <div class="tab-pane fade groupsa" th:id="${'list-' + groupsa.saPrefix}" role="tabpanel" th:data-sa="${groupsa.saPrefix}" th:aria-labelledby="${'list-' + groupsa.saPrefix + '-list'}" th:each="groupsa : ${currentgroupsas}">...</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<p></p>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script th:src="@{/jquery/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/jquery/js/popper.min.js}"
+  integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+  crossorigin="anonymous"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"
+  integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+  crossorigin="anonymous"></script>
+<script th:src="@{/bootstrap3-editable/js/bootstrap-editable.min.js}"></script>
+<script src="/aad/xiaoji/js/menus.js"></script>
+<script type="text/javascript">
+$(function() {
+  var subdomain = window.location.host.split('.', 1)[0];
+
+  var tablistcontrol = function() {
+   $('a[data-toggle="list"]').on('shown.bs.tab', function (e) {
+     // newly activated tab
+     $(e.target).find("span.badge").removeClass("badge-primary").addClass("badge-light");
+     
+     // previous active tab
+     $(e.relatedTarget).find("span.badge").removeClass("badge-light").addClass("badge-primary");
+   });
+ }
+	 
+  var pass = function() {
+    var userId = $(this).parents("tr").find("input#userId").val();
+
+    if ($(this).parents("div.groupsa").length > 0) {
+	    var saPrefix = $(this).parents("div.groupsa").data("sa");
+	    
+	    $.ajax({
+	        url: window.location.protocol + "//" + window.location.host + "/abd/manage/data/" + subdomain + "/" + saPrefix + "/" + userId + "/grantpass",
+	        type: "post",
+	        data: "",
+	        dataType: "json",
+	        contentType: "application/json;charset=UTF-8",
+	        success: function(resp) {
+	          console.log(resp);
+	          showGroupSATab(saPrefix);
+	        },
+	        error: function(resp) {
+            console.log(resp);
+	        }
+	    });
+	  } else {
+      $.ajax({
+          url: window.location.protocol + "//" + window.location.host + "/abd/manage/data/" + subdomain + "/" + userId + "/grantpass",
+          type: "post",
+          data: "",
+          dataType: "json",
+          contentType: "application/json;charset=UTF-8",
+          success: function(resp) {
+            console.log(resp);
+            showGroupTab();
+          },
+          error: function(resp) {
+            console.log(resp);
+          }
+      });
+	  }
+  }
+  
+  var leave = function() {
+    var userId = $(this).parents("tr").find("input#userId").val();
+
+    if ($(this).parents("div.groupsa").length > 0) {
+      var saPrefix = $(this).parents("div.groupsa").data("sa");
+      
+      $.ajax({
+          url: window.location.protocol + "//" + window.location.host + "/abd/manage/data/" + subdomain + "/" + saPrefix + "/" + userId + "/grantleave",
+          type: "post",
+          data: "",
+          dataType: "json",
+          contentType: "application/json;charset=UTF-8",
+          success: function(resp) {
+            console.log(resp);
+            showGroupSATab(saPrefix);
+          },
+          error: function(resp) {
+            console.log(resp);
+          }
+      });
+    } else {
+      $.ajax({
+          url: window.location.protocol + "//" + window.location.host + "/abd/manage/data/" + subdomain + "/" + userId + "/grantleave",
+          type: "post",
+          data: "",
+          dataType: "json",
+          contentType: "application/json;charset=UTF-8",
+          success: function(resp) {
+            console.log(resp);
+            showGroupTab();
+          },
+          error: function(resp) {
+            console.log(resp);
+          }
+      });
+    }
+  }
+  
+	var showGroupTab = function() {
+		var usertable = $("<table class=\"table\">" +
+		        "<thead>" +
+		        "<tr>" +
+            " <th>#</th>" +
+            " <th>识别号</th>" +
+            " <th>姓名</th>" +
+            " <th>类型</th>" +
+            " <th>加入时间</th>" +
+            " <th>操作</th>" +
+            "</tr>" +
+		        "</thead>" +
+            "<tbody>" +
+            "</tbody>" +
+				"</table>");
+		
+    $("div.tab-content > div#list-group").empty();
+    $("div.tab-content > div#list-group").append(usertable);
+		
+		$.ajax({
+	    url: window.location.protocol + "//" + window.location.host + "/abd/manage/data/" + subdomain + "/users",
+	    type: "post",
+	    data: "",
+	    dataType: "json",
+	    contentType: "application/json;charset=UTF-8",
+	    success: function(resp) {
+	      console.log(resp);
+        if (resp.data !== undefined && !$.isEmptyObject(resp.data) && resp.data.length > 0) {
+        	var verifycount = 0;
+          $.each(resp.data, function(i, n) {
+        	  var op = "";
+        	  
+        	  if (n.userVerify !== 'VERIFIED') {
+        		  op = "<button class=\"btn btn-primary btn-sm pass\">验证通过</button>";
+        		  verifycount ++;
+        	  } else {
+              op = "<button class=\"btn btn-danger btn-sm leave\">移出</button>";
+        	  }
+        	  
+        	  var userline = $("<tr>" +
+                "<input type=\"hidden\" id=\"userId\" value=\"" + n.userId + "\">" +
+                "<td>" + i + "</td>" +
+                "<td>" + n.userId + "</td>" +
+                "<td><a href=\"#\" id=\"USER_NAME\" data-url=\"/abd/manage/data/" + subdomain + "/" + n.userId + "/groupuser\" data-pk=\"" + n.userId + "\" data-title=\"用户名称\">" + n.userName + "</a></td>" +
+                "<td><a href=\"#\" id=\"USER_TYPE\" data-url=\"/abd/manage/data/" + subdomain + "/" + n.userId + "/groupuser\" data-pk=\"" + n.userId + "\" data-title=\"角色种类\">" + n.userType + "</a></td>" +
+                "<td>" + n.createTime + "</td>" +
+                "<td>" + op + "</td>" +
+        			  "</tr>");
+        	  
+            userline.find("button.pass").on("click", pass);
+            userline.find("button.leave").on("click", leave);
+        	  usertable.append(userline);
+        	  
+        	  if (i >= resp.data.length - 1) {
+              // 显示项目数量
+              $("#list-group-list > span.badge").remove();
+              if (verifycount > 0) {
+                if ($("#list-group-list").hasClass("active")) {
+                  $("#list-group-list").append("<span class=\"badge badge-light badge-pill\">" + verifycount + "</span>");
+                } else {
+                  $("#list-group-list").append("<span class=\"badge badge-primary badge-pill\">" + verifycount + "</span>");
+                }
+              }
+
+              $('td > a#USER_NAME').editable({
+                type: 'text',
+                title: '用户名称'
+              });
+              $('td > a#USER_TYPE').editable({
+                type: 'text',
+                title: '用户角色'
+              });
+        	  }
+	        });
+	      }
+	    },
+	    error: function(resp) {
+	      console.log(resp);
+	    }
+		});
+	}
+	
+	var showGroupSATabs = function() {
+		$("div.tab-content > div.groupsa").each(function(i, n) {
+			var saPrefix = $(n).data("sa");
+			
+			if (saPrefix !== undefined && saPrefix != '') {
+				showGroupSATab(saPrefix);
+			}
+		});
+	}
+	
+	var showGroupSATab = function(saPrefix) {
+	    var usertable = $("<table class=\"table\">" +
+	            "<thead>" +
+	            "<tr>" +
+	            " <th>#</th>" +
+	            " <th>识别号</th>" +
+	            " <th>姓名</th>" +
+	            " <th>类型</th>" +
+	            " <th>加入时间</th>" +
+	            " <th>操作</th>" +
+	            "</tr>" +
+	            "</thead>" +
+	            "<tbody>" +
+	            "</tbody>" +
+	        "</table>");
+	    
+	    $("div.tab-content > div#list-" + saPrefix).empty();
+	    $("div.tab-content > div#list-" + saPrefix).append(usertable);
+
+	    $.ajax({
+       url: window.location.protocol + "//" + window.location.host + "/abd/manage/data/" + subdomain + "/" + saPrefix + "/users",
+       type: "post",
+       data: "",
+       dataType: "json",
+       contentType: "application/json;charset=UTF-8",
+       success: function(resp) {
+         console.log(resp);
+         if (resp.data !== undefined && !$.isEmptyObject(resp.data) && resp.data.length > 0) {
+        	 var verifycount = 0;
+           $.each(resp.data, function(i, n) {
+             var op = "";
+             
+             if (n.userVerify !== 'VERIFIED') {
+               op = "<button class=\"btn btn-primary btn-sm pass\">验证通过</button>";
+               verifycount ++;
+             } else {
+               op = "<button class=\"btn btn-danger btn-sm leave\">移出</button>";
+             }
+             
+             var userline = $("<tr>" +
+                 "<input type=\"hidden\" id=\"userId\" value=\"" + n.userId + "\">" +
+                 "<td>" + i + "</td>" +
+                 "<td>" + n.userId + "</td>" +
+                 "<td><a href=\"#\" id=\"USER_NAME\" data-url=\"/abd/manage/data/" + subdomain + "/" + saPrefix + "/" + n.userId + "/groupsauser\" data-pk=\"" + n.userId + "\" data-title=\"用户名称\">" + n.userName + "</a></td>" +
+                 "<td><a href=\"#\" id=\"USER_TYPE\" data-url=\"/abd/manage/data/" + subdomain + "/" + saPrefix + "/" + n.userId + "/groupsauser\" data-pk=\"" + n.userId + "\" data-title=\"角色种类\">" + n.userType + "</a></td>" +
+                 "<td>" + n.createTime + "</td>" +
+                 "<td>" + op + "</td>" +
+                 "</tr>");
+
+             userline.find("button.pass").on("click", pass);
+             userline.find("button.leave").on("click", leave);
+
+             usertable.append(userline);
+
+             if (i >= resp.data.length - 1) {
+               // 显示项目数量
+               $("#list-" + saPrefix + "-list > span.badge").remove();
+               if (verifycount > 0) {
+                 if ($("#list-" + saPrefix + "-list").hasClass("active")) {
+                   $("#list-" + saPrefix + "-list").append("<span class=\"badge badge-light badge-pill\">" + verifycount + "</span>");
+                 } else {
+                   $("#list-" + saPrefix + "-list").append("<span class=\"badge badge-primary badge-pill\">" + verifycount + "</span>");
+                 }
+               }
+               
+              $('td > a#USER_NAME').editable({
+           	    type: 'text',
+           	    title: '用户名称'
+            	});
+              $('td > a#USER_TYPE').editable({
+           	    type: 'text',
+           	    title: '用户角色'
+            	});
+             }
+           });
+         }
+       },
+       error: function(resp) {
+         console.log(resp);
+       }
+     });
+	}
+	
+	$.fn.editable.defaults.mode = 'inline';
+	$.fn.editable.defaults.ajaxOptions = {type: "POST", dataType: 'json'};
+
+	showGroupTab();
+	showGroupSATabs();
+	tablistcontrol();
+});
+</script>
+</body>
+</html>

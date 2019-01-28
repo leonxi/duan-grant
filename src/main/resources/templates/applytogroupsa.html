@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="context-path" th:content="@{/}"/>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.min.css}"
+  integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous">
+<link rel="stylesheet" th:href="@{/css/docs.min.css}">
+
+<title th:text="${'申请使用' + group.name + '的' + groupsa.saName}">短应用&trade;</title>
+</head>
+<body>
+<p></p>
+<div class="container-fluid">
+	<div class="jumbotron">
+	  <h1 class="display-4" th:text="${groupsa.saName}">Hello, world!</h1>
+	  <p class="lead" th:text="${group.name + '的' + groupsa.saName + '使用申请已提交'}">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+	  <hr class="my-4">
+	  <p th:text="${group.name + '的' + groupsa.saName + '的使用需提交申请，待管理员审核通过后，方可使用！'}">It uses utility classes for typography and spacing to space content out within the larger container.</p>
+	  <a class="btn btn-primary btn-lg" href="/" role="button">返回首页</a>
+	</div>
+</div>
+</body>
+</html>
